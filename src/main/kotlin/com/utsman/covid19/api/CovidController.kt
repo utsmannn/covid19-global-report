@@ -4,6 +4,7 @@ import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
 import com.utsman.covid19.api.model.Data
 import com.utsman.covid19.api.model.Responses
 import com.utsman.covid19.api.model.Sources
+import com.utsman.covid19.api.model.Total
 import com.utsman.covid19.api.raw_model.RawCountries
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
@@ -106,8 +107,6 @@ class CovidController {
             message = "Data not yet available"
         }
 
-        val total = listData.sumBy { it.confirmed ?: 0 }
-
         if (country != null) {
             val newFilterData = listData.filter { it.country?.toLowerCase()?.contains(country.toLowerCase()) == true }
             finalListData.addAll(newFilterData)
@@ -115,27 +114,21 @@ class CovidController {
             finalListData.addAll(listData)
         }
 
-        /*if (countryCode != null) {
-            val urlCountry = "https://restcountries.eu/rest/v2/all"
-            try {
-                val responseCountry = restTemplate.getForObject(urlCountry, Array<RawCountries>::class.java)
+        val totalConfirmed = listData.sumBy { it.confirmed ?: 0 }
+        val totalDeath = listData.sumBy { it.death ?: 0 }
+        val totalRecovered = listData.sumBy { it.recovered ?: 0 }
 
-                val nameCountry = responseCountry?.find { it.code?.toLowerCase() == countryCode.toLowerCase() }?.name?.toLowerCase()
-                println(responseCountry?.size)
-                val filterCodeList = listData.filter { it.country?.toLowerCase()?.let { nameCountry?.let { c -> it.contains(c) } } == true }
-                finalListData.addAll(filterCodeList)
-                println(nameCountry)
-                if (nameCountry == null) message = "Cannot find country code"
-
-            } catch (e: HttpClientErrorException) {
-                finalListData.addAll(listData)
-                message = "Cannot find country code"
-            }
-        } else {
-            finalListData.addAll(listData)
-        }*/
-
-        return Responses(message, total, finalListData, sources, author)
+        return Responses(
+                message = message,
+                total = Total(
+                        confirmed = totalConfirmed,
+                        death = totalDeath,
+                        recovered = totalRecovered
+                ),
+                data = finalListData,
+                sources = sources,
+                author = author
+        )
     }
 
 }
