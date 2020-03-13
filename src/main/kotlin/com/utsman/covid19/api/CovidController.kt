@@ -49,7 +49,7 @@ class CovidController {
     fun getAll(@RequestParam("day") day: Int,
                @RequestParam("month") month: Int,
                @RequestParam("year") year: Int,
-               @RequestParam("country_code") countryCode: String?): Responses? {
+               @RequestParam("q") country: String?): Responses? {
 
         var message = "OK"
 
@@ -108,14 +108,21 @@ class CovidController {
 
         val total = listData.sumBy { it.confirmed ?: 0 }
 
-        if (countryCode != null) {
+        if (country != null) {
+            val newFilterData = listData.filter { it.country?.toLowerCase()?.contains(country.toLowerCase()) == true }
+            finalListData.addAll(newFilterData)
+        } else {
+            finalListData.addAll(listData)
+        }
+
+        /*if (countryCode != null) {
             val urlCountry = "https://restcountries.eu/rest/v2/all"
             try {
                 val responseCountry = restTemplate.getForObject(urlCountry, Array<RawCountries>::class.java)
 
-                val nameCountry = responseCountry?.find { it.code?.toLowerCase() == countryCode.toLowerCase() }?.name
+                val nameCountry = responseCountry?.find { it.code?.toLowerCase() == countryCode.toLowerCase() }?.name?.toLowerCase()
                 println(responseCountry?.size)
-                val filterCodeList = listData.filter { it.country == nameCountry }
+                val filterCodeList = listData.filter { it.country?.toLowerCase()?.let { nameCountry?.let { c -> it.contains(c) } } == true }
                 finalListData.addAll(filterCodeList)
                 println(nameCountry)
                 if (nameCountry == null) message = "Cannot find country code"
@@ -126,7 +133,7 @@ class CovidController {
             }
         } else {
             finalListData.addAll(listData)
-        }
+        }*/
 
         return Responses(message, total, finalListData, sources, author)
     }
