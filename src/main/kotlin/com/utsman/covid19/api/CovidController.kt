@@ -16,6 +16,7 @@ import java.text.DecimalFormat
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeParseException
 import java.time.format.FormatStyle
 import java.util.*
 import javax.net.ssl.SSLHandshakeException
@@ -92,6 +93,8 @@ class CovidController {
 
                     } catch (e: IndexOutOfBoundsException) {
                         message = "Data not yet available"
+                    } catch (e: DateTimeParseException) {
+                        message = "Data not yet available"
                     }
                 }
             }
@@ -125,7 +128,7 @@ class CovidController {
             finalListData.addAll(listData)
         }
 
-        return Responses(message, sources, total, finalListData, author)
+        return Responses(message, total, finalListData, sources, author)
     }
 
 }
