@@ -1,10 +1,7 @@
 package com.utsman.covid19.api
 
 import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
-import com.utsman.covid19.api.model.Data
-import com.utsman.covid19.api.model.Responses
-import com.utsman.covid19.api.model.Sources
-import com.utsman.covid19.api.model.Total
+import com.utsman.covid19.api.model.*
 import com.utsman.covid19.api.raw_model.RawCountries
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
@@ -126,6 +123,107 @@ class CovidController {
                         recovered = totalRecovered
                 ),
                 data = finalListData,
+                sources = sources,
+                author = author
+        )
+    }
+
+    @GetMapping("/api/country")
+    fun getByCountry(@RequestParam("day") day: Int,
+                     @RequestParam("month") month: Int,
+                     @RequestParam("year") year: Int,
+                     @RequestParam("q") country: String?): ResponsesCountry {
+
+
+        var message = "OK"
+
+        val formatter = DecimalFormat("00")
+        val dayFormat = formatter.format(day.toLong())
+        val monthFormat = formatter.format(month.toLong())
+
+        val url = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports/$monthFormat-$dayFormat-$year.csv"
+
+        val listDataCountries: MutableList<DataCountry> = mutableListOf()
+        val listData: MutableList<Data> = mutableListOf()
+        val finalListData: MutableList<DataCountry> = mutableListOf()
+
+        try {
+            val responsesString = restTemplate.getForObject(url, String::class.java)
+            val obj = responsesString?.let { csvReader().readAll(it) }
+            println(obj)
+
+            obj?.forEachIndexed { index, list ->
+                if (index != 0 && index != obj.size) {
+                    try {
+                        val lastUpdate = LocalDateTime
+                                .parse(list.get(2))
+                                .toLocalDate()
+
+                        val cal = Calendar.getInstance().apply {
+                            set(lastUpdate.year, lastUpdate.monthValue, lastUpdate.dayOfMonth)
+                        }
+                        val time = cal.time.time
+
+                        println(lastUpdate)
+                        val data = Data(
+                                id = index,
+                                country = list.get(1),
+                                province_or_state = if (list.get(0) == "") "Unknown" else list.get(0),
+                                confirmed = list.get(3).toInt(),
+                                death = list.get(4).toInt(),
+                                recovered = list.get(5).toInt(),
+                                lastUpdate = time,
+                                coordinate = listOf(list.get(6).toDouble(), list.get(7).toDouble()))
+                        listData.add(data)
+
+                    } catch (e: IndexOutOfBoundsException) {
+                        message = "Data not yet available"
+                    } catch (e: DateTimeParseException) {
+                        message = "Data not yet available"
+                    }
+                }
+            }
+
+            val listCountry = listData.groupBy { it.country }
+            listDataCountries.addAll(
+                    listCountry.map {
+                        DataCountry(
+                                country = it.key,
+                                total = Total(
+                                        it.value.sumBy { d -> d.confirmed ?: 0 },
+                                        it.value.sumBy { d -> d.death ?: 0 },
+                                        it.value.sumBy { d -> d.recovered ?: 0 }),
+                                data = it.value)
+                    }
+            )
+
+        } catch (e: HttpClientErrorException) {
+            message = "Data not yet available"
+        } catch (e: SocketException) {
+            message = "Data not yet available"
+        } catch (e: SSLHandshakeException) {
+            message = "Data not yet available"
+        }
+
+        if (country != null) {
+            val newFilterData = listDataCountries.filter { it.country?.toLowerCase()?.contains(country.toLowerCase()) == true }
+            finalListData.addAll(newFilterData)
+        } else {
+            finalListData.addAll(listDataCountries)
+        }
+
+        val totalConfirmed = listData.sumBy { it.confirmed ?: 0 }
+        val totalDeath = listData.sumBy { it.death ?: 0 }
+        val totalRecovered = listData.sumBy { it.recovered ?: 0 }
+
+        return ResponsesCountry(
+                message = message,
+                total = Total(
+                        confirmed = totalConfirmed,
+                        death = totalDeath,
+                        recovered = totalRecovered
+                ),
+                countries = finalListData,
                 sources = sources,
                 author = author
         )

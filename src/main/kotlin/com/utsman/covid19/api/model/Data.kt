@@ -13,7 +13,19 @@ data class Data(
         val coordinate: List<Double?>
 )
 
+data class DataCountry(
+        val country: String?,
+        val total: Total,
+        val data: List<Data>?
+)
+
 data class Sources(
         val institution: String,
         val url: String
+)
+
+data class Total(
+        val confirmed: Int,
+        val death: Int,
+        val recovered: Int
 )
