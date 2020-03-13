@@ -3,6 +3,9 @@
 ### How to use
 ```
 https://covid-19-report.herokuapp.com/api?day=12&month=3&year=2020
+
+// filter country
+https://covid-19-report.herokuapp.com/api?day=12&month=3&year=2020&q=china
 ```
 
 ### Source
