@@ -2,8 +2,6 @@ package com.utsman.covid19.network
 
 import com.google.gson.FieldNamingPolicy
 import com.google.gson.GsonBuilder
-import com.utsman.covid19.ResponsesCountry
-import com.utsman.covid19.ResponsesData
 import io.reactivex.Observable
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor

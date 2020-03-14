@@ -256,6 +256,41 @@ class CovidController {
                 author = author
         )
     }
+
+    @GetMapping("/api/last_date")
+    fun getLastDate(): ResponsesLastDate {
+        val url = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv"
+        var message = "OK"
+        var dateString: String? = ""
+
+        try {
+            val responsesString = restTemplate.getForObject(url, String::class.java)
+            val obj = responsesString?.let { csvReader().readAll(it) }
+            val listDate = obj?.get(0)
+            val listValue = obj?.get(1)
+
+            dateString = if (listValue?.last() != "") {
+                listDate?.last()
+            } else {
+                listDate?.get(listDate.size-2)
+            }
+
+        } catch (e: HttpClientErrorException) {
+            message = "Data not yet available"
+        } catch (e: SocketException) {
+            message = "Data not yet available"
+        } catch (e: SSLHandshakeException) {
+            message = "Data not yet available"
+        }
+
+        val dateList = dateString?.split("/")
+        val day = dateList?.get(1)?.toIntOrNull()
+        val month = dateList?.get(0)?.toIntOrNull()
+        val year = dateList?.get(2)?.toIntOrNull()
+        val lastDate = LastDate(day, month, year)
+
+        return ResponsesLastDate(message, dateString, lastDate)
+    }
 }
 
 fun String.getNumber(): Int {

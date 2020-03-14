@@ -20,3 +20,9 @@ data class ResponsesTimeLine(
         val sources: List<Sources>,
         val author: String
 )
+
+data class ResponsesLastDate(
+        val message: String,
+        val last_date_string: String?,
+        val last_date: LastDate?
+)

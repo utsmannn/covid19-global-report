@@ -1,4 +1,4 @@
-package com.utsman.covid19
+package com.utsman.covid19.network
 
 import com.google.android.gms.maps.model.LatLng
 import com.google.gson.annotations.SerializedName
@@ -53,5 +53,6 @@ data class ItemMarker(
 
 data class ItemCluster(
     val title: Int,
-    val latLng: LatLng
+    val latLng: LatLng,
+    val data: Data
 )

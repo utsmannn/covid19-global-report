@@ -39,3 +39,9 @@ data class DataTimeLine(
         val date: String,
         val total: Total
 )
+
+data class LastDate(
+        val day: Int?,
+        val month: Int?,
+        val year: Int?
+)

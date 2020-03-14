@@ -1,7 +1,8 @@
 package com.utsman.covid19
 
 import androidx.lifecycle.*
-import com.utsman.covid19.network.RetrofitInstance
+import com.utsman.covid19.ext.logi
+import com.utsman.covid19.network.*
 import io.reactivex.disposables.CompositeDisposable
 
 class CovidViewModel : ViewModel() {

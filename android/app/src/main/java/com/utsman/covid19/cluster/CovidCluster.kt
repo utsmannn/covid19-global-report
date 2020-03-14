@@ -1,15 +1,16 @@
-package com.utsman.covid19
+package com.utsman.covid19.cluster
 
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.clustering.ClusterItem
+import com.utsman.covid19.network.ItemCluster
 
 data class CovidCluster(val cluster: ItemCluster) : ClusterItem {
     override fun getSnippet(): String {
-        return ""
+        return cluster.data.country
     }
 
     override fun getTitle(): String {
-        return ""
+        return cluster.data.country
     }
 
     override fun getPosition(): LatLng {

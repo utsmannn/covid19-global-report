@@ -1,4 +1,4 @@
-package com.utsman.covid19
+package com.utsman.covid19.ext
 
 import android.app.Activity
 import android.graphics.Color

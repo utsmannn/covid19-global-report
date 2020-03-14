@@ -1,4 +1,4 @@
-package com.utsman.covid19
+package com.utsman.covid19.network
 
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
