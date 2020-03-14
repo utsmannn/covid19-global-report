@@ -13,3 +13,10 @@ data class ResponsesCountry(
         val countries: List<DataCountry>?,
         val sources: List<Sources>,
         val author: String)
+
+data class ResponsesTimeLine(
+        val message: String,
+        val timeLine: TimeLine?,
+        val sources: List<Sources>,
+        val author: String
+)

@@ -134,7 +134,6 @@ class CovidController {
                      @RequestParam("year") year: Int,
                      @RequestParam("q") country: String?): ResponsesCountry {
 
-
         var message = "OK"
 
         val formatter = DecimalFormat("00")
@@ -212,9 +211,9 @@ class CovidController {
             finalListData.addAll(listDataCountries)
         }
 
-        val totalConfirmed = listData.sumBy { it.confirmed ?: 0 }
-        val totalDeath = listData.sumBy { it.death ?: 0 }
-        val totalRecovered = listData.sumBy { it.recovered ?: 0 }
+        val totalConfirmed = finalListData.sumBy { it.total.confirmed }
+        val totalDeath = finalListData.sumBy { it.total.death }
+        val totalRecovered = finalListData.sumBy { it.total.recovered }
 
         return ResponsesCountry(
                 message = message,
@@ -229,4 +228,36 @@ class CovidController {
         )
     }
 
+    @GetMapping("api/stat")
+    fun getTimeline(@RequestParam("q") country: String?): ResponsesTimeLine {
+        val date1 = "4-3-2020"
+        val date2 = "6-3-2020"
+        val date3 = "8-3-2020"
+        val date4 = "10-3-2020"
+        val date5 = "12-3-2020"
+
+        val day1 = getByCountry(4, 3, 2020, country).total
+        val day2 = getByCountry(6, 3, 2020, country).total
+        val day3 = getByCountry(8, 3, 2020, country).total
+        val day4 = getByCountry(10, 3, 2020, country).total
+        val day5 = getByCountry(12, 3, 2020, country).total
+
+        val dataTimeLine1 = DataTimeLine(date1, day1)
+        val dataTimeLine2 = DataTimeLine(date2, day2)
+        val dataTimeLine3 = DataTimeLine(date3, day3)
+        val dataTimeLine4 = DataTimeLine(date4, day4)
+        val dataTimeLine5 = DataTimeLine(date5, day5)
+        val timeline = TimeLine(country
+                ?: "", listOf(dataTimeLine1, dataTimeLine2, dataTimeLine3, dataTimeLine4, dataTimeLine5))
+        return ResponsesTimeLine(
+                message = "OK",
+                timeLine = timeline,
+                sources = sources,
+                author = author
+        )
+    }
+}
+
+fun String.getNumber(): Int {
+    return this.replace("[^0-9]".toRegex(), "").toIntOrNull() ?: 0
 }

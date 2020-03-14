@@ -29,3 +29,13 @@ data class Total(
         val death: Int,
         val recovered: Int
 )
+
+data class TimeLine(
+        val country: String,
+        val timeLine: List<DataTimeLine>
+)
+
+data class DataTimeLine(
+        val date: String,
+        val total: Total
+)

@@ -3,12 +3,25 @@ package com.utsman.covid19
 import com.google.android.gms.maps.model.LatLng
 import com.google.gson.annotations.SerializedName
 
-data class Responses(
+data class ResponsesData(
     val message: String,
     val total: Total,
     val data: List<Data>?,
     val sources: List<Sources>,
     val author: String)
+
+data class ResponsesCountry(
+    val message: String,
+    val total: Total,
+    val countries: List<DataCountry>?,
+    val sources: List<Sources>,
+    val author: String)
+
+data class DataCountry(
+    val country: String?,
+    val total: Total,
+    val data: List<Data>?
+)
 
 data class Data(
     val id: Int?,
@@ -35,5 +48,10 @@ data class Total(
 
 data class ItemMarker(
     val title: String,
+    val latLng: List<LatLng>
+)
+
+data class ItemCluster(
+    val title: Int,
     val latLng: LatLng
 )
