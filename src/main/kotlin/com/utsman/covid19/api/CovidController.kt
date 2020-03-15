@@ -343,7 +343,7 @@ class CovidController {
         )
     }
 
-    @GetMapping("/api/image_thumbnail")
+    @GetMapping("/api/image_thumbnail", produces = [MediaType.APPLICATION_JSON_VALUE])
     fun getThumbnail(@RequestParam("url") url: String): ResponsesImage? {
         val doc = Jsoup.connect(url).get()
         val element = doc.select("meta")
