@@ -37,3 +37,7 @@ data class ResponsesArticles(
 data class ResponsesImage(
         val image_url: String?
 )
+
+data class ResponseSituationReport(
+        val download_url: String?
+)

@@ -5,6 +5,7 @@ import com.rometools.rome.feed.synd.SyndContent
 import com.rometools.rome.io.SyndFeedInput
 import com.rometools.rome.io.XmlReader
 import com.utsman.covid19.api.model.*
+import com.utsman.covid19.api.raw_model.RawMasterRecursive
 import org.json.JSONException
 import org.jsoup.HttpStatusException
 import org.jsoup.Jsoup
@@ -360,8 +361,23 @@ class CovidController {
 
         return ResponsesImage(imageUrl)
     }
-}
 
-fun String.getNumber(): Int {
-    return this.replace("[^0-9]".toRegex(), "").toIntOrNull() ?: 0
+    @GetMapping("/api/sit_rep", produces = [MediaType.APPLICATION_JSON_VALUE])
+    fun getSitRep(): ResponseSituationReport {
+        var pathPdf = ""
+        val urlMaster = "https://api.github.com/repos/CSSEGISandData/COVID-19/git/trees/master?recursive=1"
+        val responsesMaster = restTemplate.getForObject(urlMaster, RawMasterRecursive::class.java)
+        val findPdfCommitPath = responsesMaster?.tree?.find { it?.path?.contains("sit_rep_pdfs") == true }?.url
+
+        pathPdf = if (findPdfCommitPath != null) {
+            val responsePdfSitRep = restTemplate.getForObject(findPdfCommitPath, RawMasterRecursive::class.java)
+            val pathName = responsePdfSitRep?.tree?.last()?.path
+            val pathDownload = "https://github.com/CSSEGISandData/COVID-19/raw/master/who_covid_19_situation_reports/who_covid_19_sit_rep_pdfs/$pathName"
+            pathDownload
+        } else {
+            ""
+        }
+
+        return ResponseSituationReport(pathPdf)
+    }
 }

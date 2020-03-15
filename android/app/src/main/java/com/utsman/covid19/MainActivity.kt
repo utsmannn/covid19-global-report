@@ -12,7 +12,6 @@ import androidx.lifecycle.Observer
 import com.github.mikephil.charting.components.AxisBase
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.*
-import com.github.mikephil.charting.formatter.IAxisValueFormatter
 import com.github.mikephil.charting.formatter.ValueFormatter
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.SupportMapFragment
@@ -96,15 +95,24 @@ class MainActivity : AppCompatActivity() {
 
         bottomSheetBehavior.hide()
         getTotal()
-        //viewModel.getArticles(null)
+
+        main_progress_bar.setMarginTop(37.dp)
 
         viewModel.networkState.observe(this, Observer {
             when (it) {
-                NetworkState.LOADING, NetworkState.ERROR -> {
+                NetworkState.LOADING -> {
+                    bottomSheetBehavior.hide()
+                    main_progress_bar.visibility = View.VISIBLE
+                    bottom_sheet.pager_articles.visibility = View.GONE
+                    bottom_sheet.text_article.visibility = View.GONE
+                }
+                NetworkState.ERROR -> {
+                    main_progress_bar.visibility = View.GONE
                     bottom_sheet.pager_articles.visibility = View.GONE
                     bottom_sheet.text_article.visibility = View.GONE
                 }
                 else -> {
+                    main_progress_bar.visibility = View.GONE
                     bottom_sheet.pager_articles.visibility = View.VISIBLE
                     bottom_sheet.text_article.visibility = View.VISIBLE
                 }
@@ -159,13 +167,16 @@ class MainActivity : AppCompatActivity() {
                     bottom_sheet.text_recovered.text = it.recovered.formatted()
 
                     bottomSheetBehavior.collapse(composite)
-
                     setupPieChart(it)
                 }
 
                 viewModel.articlesGlobal.value?.let {
                     addItems(it)
                 }
+
+                viewModel.getTimeLine("").observe(this, Observer {
+                    setupLineChart(it?.timeLine)
+                })
             }
 
             viewModel.data.observe(this, Observer { data ->
@@ -184,7 +195,6 @@ class MainActivity : AppCompatActivity() {
                 clusterManager.markerCollection.setInfoWindowAdapter(infoWindowAdapter)
 
                 clusterManager.setOnClusterItemClickListener {
-                    bottomSheetBehavior.hide()
                     this.covidCluster = it
                     false
                 }
@@ -231,8 +241,10 @@ class MainActivity : AppCompatActivity() {
             bottom_sheet.text_death.text = it.death.formatted()
             bottom_sheet.text_recovered.text = it.recovered.formatted()
 
-            bottomSheetBehavior.collapse(composite)
-            setupPieChart(it)
+            composite.delay(800) {
+                bottomSheetBehavior.collapse(composite)
+                setupPieChart(it)
+            }
         })
 
     }
@@ -286,49 +298,73 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        /*val confirmedValue = (total?.confirmed ?: 0).toFloat()
-        val deathValue = (total?.death ?: 0).toFloat()
-        val recoveredValue = (total?.recovered ?: 0).toFloat()*/
+        val rawDataConfirmed: MutableList<Entry> = mutableListOf()
+        val rawDataDeath: MutableList<Entry> = mutableListOf()
+        val rawDataRecovered: MutableList<Entry> = mutableListOf()
 
-        /*val rawData = listOf(
-            PieEntry(confirmedValue, "Confirmed"),
-            PieEntry(deathValue, "Death"),
-            PieEntry(recoveredValue, "Recovered")
-        )*/
-
-        val rawData: MutableList<Entry> = mutableListOf()
         data?.forEachIndexed { index, dataTimeLine ->
             logi("index -> $index +++ data -> ${dataTimeLine.total.confirmed}")
-            val dataLine = Entry(index.toFloat(), dataTimeLine.total.confirmed.toFloat(), dataTimeLine.date)
-            rawData.add(dataLine)
+            val dataLineConfirmed = Entry(index.toFloat(), dataTimeLine.total.confirmed.toFloat(), dataTimeLine.date)
+            val dataLineDeath = Entry(index.toFloat(), dataTimeLine.total.death.toFloat(), dataTimeLine.date)
+            val dataLineRecovered = Entry(index.toFloat(), dataTimeLine.total.recovered.toFloat(), dataTimeLine.date)
+
+            rawDataConfirmed.add(dataLineConfirmed)
+            rawDataDeath.add(dataLineDeath)
+            rawDataRecovered.add(dataLineRecovered)
         }
 
-        val lineDataSet = LineDataSet(rawData, "")
-        lineDataSet.valueTextColor = Color.WHITE
-        lineDataSet.valueTextSize = 10f
-        lineDataSet.valueFormatter = valueFormat
+        val lineDataSetConfirmed = LineDataSet(rawDataConfirmed, "Confirmed").apply {
+            valueTextColor = Color.WHITE
+            valueTextSize = 10f
+            valueFormatter = valueFormat
+            color = ContextCompat.getColor(this@MainActivity, R.color.colorConfirmed)
+            mode = LineDataSet.Mode.CUBIC_BEZIER
+            setCircleColors(ContextCompat.getColor(this@MainActivity, R.color.colorConfirmed))
+            setDrawCircleHole(false)
+        }
 
+        val lineDataSetDeath = LineDataSet(rawDataDeath, "Death").apply {
+            valueTextColor = Color.WHITE
+            valueTextSize = 10f
+            valueFormatter = valueFormat
+            color = ContextCompat.getColor(this@MainActivity, R.color.colorDeath)
+            mode = LineDataSet.Mode.CUBIC_BEZIER
+            setCircleColors(ContextCompat.getColor(this@MainActivity, R.color.colorDeath))
+            setDrawCircleHole(false)
+        }
 
-        val lineData = LineData(lineDataSet)
+        val lineDataSetRecovered = LineDataSet(rawDataRecovered, "Recovered").apply {
+            valueTextColor = Color.WHITE
+            valueTextSize = 10f
+            valueFormatter = valueFormat
+            color = ContextCompat.getColor(this@MainActivity, R.color.colorRecovered)
+            mode = LineDataSet.Mode.CUBIC_BEZIER
+            setCircleColors(ContextCompat.getColor(this@MainActivity, R.color.colorRecovered))
+            setDrawCircleHole(false)
+        }
+
+        val lineData = LineData(lineDataSetConfirmed, lineDataSetDeath, lineDataSetRecovered)
         lineData.setValueTextColor(Color.WHITE)
 
         val xAxis = line_chart.xAxis
-        // Set the xAxis position to bottom. Default is top
-        xAxis.position = XAxis.XAxisPosition.BOTTOM
-        //Customizing x axis value
-        val months = arrayOf("M", "T", "W", "T", "F", "S", "S")
+        xAxis.position = XAxis.XAxisPosition.TOP
+        val yAxis = line_chart.axisRight
+
 
         val formatter = object : ValueFormatter() {
             override fun getAxisLabel(value: Float, axis: AxisBase?): String?{
                 return data?.map { it.date }?.get(value.toInt())
             }
         }
-        //xAxis.granularity = 1f // minimum axis-step (interval) is 1
-        xAxis.valueFormatter = formatter
 
-        //line_chart.setEntryLabelTextSize(10f)
-        //line_chart.setHoleColor(Color.TRANSPARENT)
-        //line_chart.setEntryLabelColor(ContextCompat.getColor(this, R.color.colorSubtitle))
+        val yFormatter = object : ValueFormatter() {
+            override fun getAxisLabel(value: Float, axis: AxisBase?): String?{
+                return ""
+            }
+        }
+
+        xAxis.valueFormatter = formatter
+        yAxis.valueFormatter = yFormatter
         line_chart.legend.textColor = ContextCompat.getColor(this, R.color.colorSubtitle)
         line_chart.description.text = ""
         line_chart.description.textColor = ContextCompat.getColor(this, R.color.colorSubtitle)

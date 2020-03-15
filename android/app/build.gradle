@@ -64,6 +64,6 @@ dependencies {
     kapt 'com.github.bumptech.glide:compiler:4.11.0'
 
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
-    implementation 'com.facebook.shimmer:shimmer:0.5.0'
-    implementation 'com.github.rubensousa:gravitysnaphelper:2.2.0'
+    //noinspection GradleDependency
+    implementation 'com.mikepenz:materialdrawer:6.1.1'
 }
