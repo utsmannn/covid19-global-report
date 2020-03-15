@@ -13,137 +13,180 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginBottom="-30dp"
+        android:id="@+id/bottom_card"
         app:cardCornerRadius="26dp">
 
-        <RelativeLayout
-            android:id="@+id/container_main_info"
+        <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="match_parent">
 
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:layout_margin="6dp"
-                android:alpha="0.6"
-                android:src="@drawable/ic_max" />
-
-            <LinearLayout
+            <RelativeLayout
+                android:id="@+id/container_main_info"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="12dp">
+                android:layout_height="wrap_content">
 
-                <TextView
+                <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Worldwide"
-                    android:id="@+id/text_title_report"
-                    android:layout_marginLeft="12dp"
-                    android:layout_marginStart="12dp"
-                    android:textSize="18sp"
-                    android:layout_marginTop="12dp"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="last update: "
-                    android:id="@+id/text_last_update"
-                    android:layout_marginLeft="12dp"
-                    android:layout_marginStart="12dp"
-                    android:textSize="10sp"/>
+                    android:layout_centerHorizontal="true"
+                    android:layout_margin="6dp"
+                    android:alpha="0.6"
+                    android:src="@drawable/ic_max" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:orientation="horizontal"
-                    android:padding="12dp">
+                    android:orientation="vertical">
 
                     <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="40dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        android:layout_weight="1"
-                        android:gravity="center">
+                        android:padding="12dp">
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:gravity="center"
-                            android:text="Confirmed"
-                            android:textColor="@color/colorSubtitle" />
+                            android:text="Worldwide"
+                            android:id="@+id/text_title_report"
+                            android:layout_marginLeft="12dp"
+                            android:layout_marginStart="12dp"
+                            android:textSize="18sp"
+                            android:layout_marginTop="12dp"/>
 
                         <TextView
-                            android:id="@+id/text_total"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:text="last update: "
+                            android:id="@+id/text_last_update"
+                            android:layout_marginLeft="12dp"
+                            android:layout_marginStart="12dp"
+                            android:textSize="10sp"/>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
                             android:gravity="center"
-                            android:text="--"
-                            android:textColor="@color/colorConfirmed" />
+                            android:orientation="horizontal"
+                            android:padding="12dp">
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="40dp"
+                                android:orientation="vertical"
+                                android:layout_weight="1"
+                                android:gravity="center">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center"
+                                    android:text="Confirmed"
+                                    android:textColor="@color/colorSubtitle" />
+
+                                <TextView
+                                    android:id="@+id/text_total"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center"
+                                    android:text="--"
+                                    android:textColor="@color/colorConfirmed" />
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="40dp"
+                                android:orientation="vertical"
+                                android:layout_weight="1"
+                                android:gravity="center">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center"
+                                    android:text="Death"
+                                    android:textColor="@color/colorSubtitle" />
+
+                                <TextView
+                                    android:id="@+id/text_death"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center"
+                                    android:text="--"
+                                    android:textColor="@color/colorDeath" />
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="40dp"
+                                android:orientation="vertical"
+                                android:layout_weight="1"
+                                android:gravity="center">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center"
+                                    android:text="Recovered"
+                                    android:textColor="@color/colorSubtitle" />
+
+                                <TextView
+                                    android:id="@+id/text_recovered"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center"
+                                    android:text="--"
+                                    android:textColor="@color/colorRecovered" />
+
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+                        <com.github.mikephil.charting.charts.PieChart
+                            android:layout_width="250dp"
+                            android:layout_height="250dp"
+                            android:layout_gravity="center"
+                            android:layout_marginTop="12dp"
+                            android:id="@+id/pie_chart" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Timeline"
+                            android:layout_marginTop="18dp"
+                            android:textSize="17sp"/>
+
+                        <com.github.mikephil.charting.charts.LineChart
+                            android:layout_width="250dp"
+                            android:layout_height="250dp"
+                            android:layout_gravity="center"
+                            android:layout_marginTop="12dp"
+                            android:id="@+id/line_chart"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Articles"
+                            android:layout_marginTop="18dp"
+                            android:id="@+id/text_article"
+                            android:textSize="17sp"/>
 
                     </LinearLayout>
 
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="40dp"
-                        android:orientation="vertical"
-                        android:layout_weight="1"
-                        android:gravity="center">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:gravity="center"
-                            android:text="Death"
-                            android:textColor="@color/colorSubtitle" />
-
-                        <TextView
-                            android:id="@+id/text_death"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:gravity="center"
-                            android:text="--"
-                            android:textColor="@color/colorDeath" />
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="40dp"
-                        android:orientation="vertical"
-                        android:layout_weight="1"
-                        android:gravity="center">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:gravity="center"
-                            android:text="Recovered"
-                            android:textColor="@color/colorSubtitle" />
-
-                        <TextView
-                            android:id="@+id/text_recovered"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:gravity="center"
-                            android:text="--"
-                            android:textColor="@color/colorRecovered" />
-
-                    </LinearLayout>
+                    <androidx.viewpager.widget.ViewPager
+                        android:layout_width="match_parent"
+                        android:layout_height="200dp"
+                        android:id="@+id/pager_articles"
+                        android:padding="6dp"
+                        android:clipToPadding="false"/>
 
                 </LinearLayout>
 
-                <com.github.mikephil.charting.charts.PieChart
-                    android:layout_width="300dp"
-                    android:layout_height="300dp"
-                    android:layout_gravity="center"
-                    android:layout_marginTop="12dp"
-                    android:id="@+id/pie_chart" />
+            </RelativeLayout>
 
-            </LinearLayout>
-
-        </RelativeLayout>
+        </androidx.core.widget.NestedScrollView>
 
     </androidx.cardview.widget.CardView>
 

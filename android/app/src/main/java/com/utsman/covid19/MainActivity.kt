@@ -13,7 +13,6 @@ import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
 import com.github.mikephil.charting.formatter.ValueFormatter
-import com.github.mikephil.charting.utils.ColorTemplate
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
@@ -24,8 +23,9 @@ import com.google.maps.android.clustering.ClusterManager
 import com.utsman.covid19.cluster.CovidCluster
 import com.utsman.covid19.cluster.CustomClusterRender
 import com.utsman.covid19.ext.*
-import com.utsman.covid19.network.Data
+import com.utsman.covid19.network.Articles
 import com.utsman.covid19.network.ItemCluster
+import com.utsman.covid19.network.NetworkState
 import com.utsman.covid19.network.Total
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.activity_main.*
@@ -70,6 +70,7 @@ class MainActivity : AppCompatActivity() {
             bottom_sheet.text_recovered.text = covidCluster?.cluster?.data?.recovered?.formatted()
 
             bottomSheetBehavior.collapse(composite)
+            viewModel.getArticles(country)
 
             setupPieChart(
                 Total(
@@ -93,6 +94,29 @@ class MainActivity : AppCompatActivity() {
 
         bottomSheetBehavior.hide()
         getTotal()
+        //viewModel.getArticles(null)
+
+        viewModel.networkState.observe(this, Observer {
+            when (it) {
+                NetworkState.LOADING, NetworkState.ERROR -> {
+                    bottom_sheet.pager_articles.visibility = View.GONE
+                    bottom_sheet.text_article.visibility = View.GONE
+                }
+                else -> {
+                    bottom_sheet.pager_articles.visibility = View.VISIBLE
+                    bottom_sheet.text_article.visibility = View.VISIBLE
+                }
+            }
+        })
+
+        viewModel.articles.observe(this, Observer {
+            addItems(it)
+        })
+
+        viewModel.articlesGlobal.observe(this, Observer {
+            addItems(it)
+        })
+
 
         viewModel.getLastDate().observe(this, Observer {
             val day = it.lastDate?.day
@@ -101,7 +125,6 @@ class MainActivity : AppCompatActivity() {
             viewModel.getData(day, month)
 
             bottom_sheet.text_last_update.text = "Last update: $day/$month/$year"
-            //bottom_sheet.text_last_update.text = "Last update: $day/$month/$year"
         })
 
         bottomSheetBehavior.addBottomSheetCallback(object :
@@ -112,8 +135,10 @@ class MainActivity : AppCompatActivity() {
             override fun onStateChanged(bottomSheet: View, newState: Int) {
                 if (newState == BottomSheetBehavior.STATE_EXPANDED) {
                     bottom_sheet.container_main_info.animTo("Y", 25.dpf)
+                    bottom_sheet.bottom_card.radius = 0.dpf
                 } else {
-                    bottomSheet.container_main_info.animTo("Y", 0.dpf)
+                    bottom_sheet.container_main_info.animTo("Y", 0.dpf)
+                    bottom_sheet.bottom_card.radius = 26.dpf
                 }
             }
 
@@ -121,6 +146,8 @@ class MainActivity : AppCompatActivity() {
 
         val mapsView = (google_map_view as SupportMapFragment)
         mapsView.getMapAsync { gmap ->
+            viewModel.getArticles("")
+
             gmap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.dark_maps))
             gmap.setOnMapClickListener {
                 viewModel.total.value?.let {
@@ -133,10 +160,13 @@ class MainActivity : AppCompatActivity() {
 
                     setupPieChart(it)
                 }
+
+                viewModel.articlesGlobal.value?.let {
+                    addItems(it)
+                }
             }
 
             viewModel.data.observe(this, Observer { data ->
-
                 val clusterManager = ClusterManager<CovidCluster>(this, gmap)
                 clusterManager.renderer =
                     CustomClusterRender(
@@ -178,8 +208,18 @@ class MainActivity : AppCompatActivity() {
                     clusterManager.cluster()
                 }
             })
-
         }
+    }
+
+    private fun addItems(it: List<Articles>) {
+        pager_articles.setPadding(12.dp, 0, 12.dp, 0)
+        pager_articles.clipToPadding = false
+
+        val pagerAdapter = PagerAdapter(this)
+        pagerAdapter.addArticles(it)
+
+        pager_articles.adapter = pagerAdapter
+        pager_articles.offscreenPageLimit = 20
     }
 
     private fun getTotal() {

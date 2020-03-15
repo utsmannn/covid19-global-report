@@ -43,7 +43,7 @@ fun BottomSheetBehavior<*>.expand(composite: CompositeDisposable) {
     if (!isHidden()) {
         state = BottomSheetBehavior.STATE_HIDDEN
     }
-    composite.delay(400) {
+    composite.delay(100) {
         state = BottomSheetBehavior.STATE_EXPANDED
     }
 }
@@ -52,7 +52,7 @@ fun BottomSheetBehavior<*>.collapse(composite: CompositeDisposable) {
     if (!isHidden()) {
         state = BottomSheetBehavior.STATE_HIDDEN
     }
-    composite.delay(400) {
+    composite.delay(100) {
         state = BottomSheetBehavior.STATE_COLLAPSED
     }
 }
@@ -77,7 +77,7 @@ fun BottomSheetBehavior<*>.isHidden(): Boolean {
 
 fun View.animTo(xy: String, size: Float) {
     ObjectAnimator.ofFloat(this, "translation$xy", size).apply {
-        duration = 300
+        duration = 100
         start()
     }
 }

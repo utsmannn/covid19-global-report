@@ -1,5 +1,6 @@
 package com.utsman.covid19.network
 
+import android.annotation.SuppressLint
 import com.google.android.gms.maps.model.LatLng
 import com.google.gson.annotations.SerializedName
 
@@ -88,5 +89,6 @@ data class Articles(
     val url: String,
     @SerializedName("publish_date")
     val publishDate: Long,
-    val publisher: String
+    val publisher: String,
+    var imgUrl: String? = null
 )

@@ -48,7 +48,7 @@ class CovidController {
             Sources("Italy Ministry of Health", "http://www.salute.gov.it/nuovocoronavirus")
     )
 
-    @GetMapping("/api")
+    @GetMapping("/api", produces = [MediaType.APPLICATION_JSON_VALUE])
     fun getAll(@RequestParam("day") day: Int,
                @RequestParam("month") month: Int,
                @RequestParam("year") year: Int,
@@ -133,7 +133,7 @@ class CovidController {
         )
     }
 
-    @GetMapping("/api/country")
+    @GetMapping("/api/country", produces = [MediaType.APPLICATION_JSON_VALUE])
     fun getByCountry(@RequestParam("day") day: Int,
                      @RequestParam("month") month: Int,
                      @RequestParam("year") year: Int,
@@ -233,7 +233,7 @@ class CovidController {
         )
     }
 
-    @GetMapping("api/stat")
+    @GetMapping("api/stat", produces = [MediaType.APPLICATION_JSON_VALUE])
     fun getTimeline(@RequestParam("q") country: String?): ResponsesTimeLine {
         val date1 = "4-3-2020"
         val date2 = "6-3-2020"
@@ -262,7 +262,7 @@ class CovidController {
         )
     }
 
-    @GetMapping("/api/last_date")
+    @GetMapping("/api/last_date", produces = [MediaType.APPLICATION_JSON_VALUE])
     fun getLastDate(): ResponsesLastDate {
         val url = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv"
         var message = "OK"
