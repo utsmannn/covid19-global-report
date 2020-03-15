@@ -1,21 +1,26 @@
 package com.utsman.covid19.api
 
 import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
+import com.rometools.rome.feed.synd.SyndContent
+import com.rometools.rome.io.SyndFeedInput
+import com.rometools.rome.io.XmlReader
 import com.utsman.covid19.api.model.*
-import com.utsman.covid19.api.raw_model.RawCountries
+import org.json.JSONException
+import org.jsoup.HttpStatusException
+import org.jsoup.Jsoup
+import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.RestTemplate
+import java.lang.IllegalStateException
 import java.net.SocketException
+import java.net.URL
 import java.text.DecimalFormat
 import java.time.LocalDateTime
-import java.time.ZoneOffset
-import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
-import java.time.format.FormatStyle
 import java.util.*
 import javax.net.ssl.SSLHandshakeException
 
@@ -290,6 +295,65 @@ class CovidController {
         val lastDate = LastDate(day, month, year)
 
         return ResponsesLastDate(message, dateString, lastDate)
+    }
+
+    @GetMapping("/api/articles", produces = [MediaType.APPLICATION_JSON_VALUE])
+    fun getArticles(@RequestParam("q") q: String): ResponsesArticles? {
+        val articles: MutableList<Articles> = mutableListOf()
+        var message = "OK"
+        val urlXml = "https://news.google.com/rss/search?q=covid%20$q&hl=en-ID&gl=ID&ceid=ID:en"
+
+        try {
+
+            val synd = SyndFeedInput().build(XmlReader(URL(urlXml)))
+            println(synd.title)
+
+            val art = synd.entries.map { ent ->
+                println(ent.publishedDate)
+                println(ent.source.title)
+                Articles(
+                        title = ent.title,
+                        url = ent.link,
+                        publish_date = ent.publishedDate.time,
+                        publisher = ent.source.title
+                )
+            }
+
+            articles.addAll(art)
+
+        } catch (e: JSONException) {
+            e.printStackTrace()
+            message = "Failed"
+        } catch (e: IllegalStateException) {
+            e.printStackTrace()
+            message = "Failed"
+        } catch (e: HttpStatusException) {
+            e.printStackTrace()
+            message = "Failed"
+        } catch (e: SocketException) {
+            e.printStackTrace()
+            message = "Failed"
+        }
+
+        return ResponsesArticles(
+                message = message,
+                topic = q,
+                articles = articles,
+                author = author
+        )
+    }
+
+    @GetMapping("/image_thumbnail")
+    fun getThumbnail(@RequestParam("url") url: String): ResponsesImage? {
+        val doc = Jsoup.connect(url).get()
+        val element = doc.select("meta")
+
+        val imageUrlElement = element.map { it.attr("content")  }
+        val imageUrl = imageUrlElement.find { it.toLowerCase().contains(".jpg") || it.toLowerCase().contains(".png") }
+
+        println(imageUrl)
+
+        return ResponsesImage(imageUrl)
     }
 }
 

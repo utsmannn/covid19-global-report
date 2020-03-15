@@ -26,3 +26,14 @@ data class ResponsesLastDate(
         val last_date_string: String?,
         val last_date: LastDate?
 )
+
+data class ResponsesArticles(
+        val message: String,
+        val topic: String,
+        val articles: List<Articles>,
+        val author: String
+)
+
+data class ResponsesImage(
+        val image_url: String?
+)

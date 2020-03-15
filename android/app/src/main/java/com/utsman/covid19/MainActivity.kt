@@ -1,21 +1,32 @@
 package com.utsman.covid19
 
+import android.annotation.SuppressLint
+import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.lifecycle.Observer
+import com.github.mikephil.charting.data.PieData
+import com.github.mikephil.charting.data.PieDataSet
+import com.github.mikephil.charting.data.PieEntry
+import com.github.mikephil.charting.formatter.ValueFormatter
+import com.github.mikephil.charting.utils.ColorTemplate
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.gms.maps.model.Marker
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.maps.android.clustering.ClusterManager
 import com.utsman.covid19.cluster.CovidCluster
 import com.utsman.covid19.cluster.CustomClusterRender
 import com.utsman.covid19.ext.*
+import com.utsman.covid19.network.Data
 import com.utsman.covid19.network.ItemCluster
+import com.utsman.covid19.network.Total
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.bottom_sheet_layout.*
@@ -49,20 +60,29 @@ class MainActivity : AppCompatActivity() {
             }
 
             view.info_title.text = title
-            view.info_confirmed.text = covidCluster?.cluster?.data?.confirmed?.toString()
-            view.info_death.text = covidCluster?.cluster?.data?.death?.toString()
-            view.info_recovered.text = covidCluster?.cluster?.data?.recovered?.toString()
+            view.info_confirmed.text = covidCluster?.cluster?.data?.confirmed?.formatted()
+            view.info_death.text = covidCluster?.cluster?.data?.death?.formatted()
+            view.info_recovered.text = covidCluster?.cluster?.data?.recovered?.formatted()
 
             bottom_sheet.text_title_report.text = title
-            bottom_sheet.text_total.text = covidCluster?.cluster?.data?.confirmed?.toString()
-            bottom_sheet.text_death.text = covidCluster?.cluster?.data?.death?.toString()
-            bottom_sheet.text_recovered.text = covidCluster?.cluster?.data?.recovered?.toString()
+            bottom_sheet.text_total.text = covidCluster?.cluster?.data?.confirmed?.formatted()
+            bottom_sheet.text_death.text = covidCluster?.cluster?.data?.death?.formatted()
+            bottom_sheet.text_recovered.text = covidCluster?.cluster?.data?.recovered?.formatted()
 
             bottomSheetBehavior.collapse(composite)
+
+            setupPieChart(
+                Total(
+                    confirmed = covidCluster?.cluster?.data?.confirmed ?: 0,
+                    death = covidCluster?.cluster?.data?.death ?: 0,
+                    recovered = covidCluster?.cluster?.data?.recovered ?: 0
+                )
+            )
             return view
         }
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -77,17 +97,21 @@ class MainActivity : AppCompatActivity() {
         viewModel.getLastDate().observe(this, Observer {
             val day = it.lastDate?.day
             val month = it.lastDate?.month
+            val year = it.lastDate?.year
             viewModel.getData(day, month)
+
+            bottom_sheet.text_last_update.text = "Last update: $day/$month/$year"
+            //bottom_sheet.text_last_update.text = "Last update: $day/$month/$year"
         })
 
-        bottomSheetBehavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
+        bottomSheetBehavior.addBottomSheetCallback(object :
+            BottomSheetBehavior.BottomSheetCallback() {
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
             }
 
             override fun onStateChanged(bottomSheet: View, newState: Int) {
                 if (newState == BottomSheetBehavior.STATE_EXPANDED) {
                     bottom_sheet.container_main_info.animTo("Y", 25.dpf)
-
                 } else {
                     bottomSheet.container_main_info.animTo("Y", 0.dpf)
                 }
@@ -97,7 +121,7 @@ class MainActivity : AppCompatActivity() {
 
         val mapsView = (google_map_view as SupportMapFragment)
         mapsView.getMapAsync { gmap ->
-
+            gmap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.dark_maps))
             gmap.setOnMapClickListener {
                 viewModel.total.value?.let {
                     bottom_sheet.text_title_report.text = "Worldwide"
@@ -106,6 +130,8 @@ class MainActivity : AppCompatActivity() {
                     bottom_sheet.text_recovered.text = it.recovered.formatted()
 
                     bottomSheetBehavior.collapse(composite)
+
+                    setupPieChart(it)
                 }
             }
 
@@ -164,7 +190,50 @@ class MainActivity : AppCompatActivity() {
             bottom_sheet.text_recovered.text = it.recovered.formatted()
 
             bottomSheetBehavior.collapse(composite)
+            setupPieChart(it)
         })
+
+    }
+
+    private fun setupPieChart(total: Total?) {
+        val valueFormat = object : ValueFormatter() {
+            override fun getFormattedValue(value: Float): String {
+                return value.toInt().formatted()
+            }
+        }
+
+        val confirmedValue = (total?.confirmed ?: 0).toFloat()
+        val deathValue = (total?.death ?: 0).toFloat()
+        val recoveredValue = (total?.recovered ?: 0).toFloat()
+
+        val confirmedColor = ContextCompat.getColor(this, R.color.colorConfirmed)
+        val deathColor = ContextCompat.getColor(this, R.color.colorDeath)
+        val recoveredColor = ContextCompat.getColor(this, R.color.colorRecovered)
+
+        val rawData = listOf(
+            PieEntry(confirmedValue, "Confirmed"),
+            PieEntry(deathValue, "Death"),
+            PieEntry(recoveredValue, "Recovered")
+        )
+
+        val pieDataSet = PieDataSet(rawData, "")
+        pieDataSet.valueTextColor = Color.WHITE
+        pieDataSet.valueTextSize = 10f
+        pieDataSet.valueFormatter = valueFormat
+
+        val pieData = PieData(pieDataSet)
+        pieData.setValueTextColor(Color.WHITE)
+        pieDataSet.setColors(confirmedColor, deathColor, recoveredColor)
+
+        pie_chart.setEntryLabelTextSize(10f)
+        pie_chart.setHoleColor(Color.TRANSPARENT)
+        pie_chart.setEntryLabelColor(ContextCompat.getColor(this, R.color.colorSubtitle))
+        pie_chart.legend.textColor = ContextCompat.getColor(this, R.color.colorSubtitle)
+        pie_chart.description.text = ""
+        pie_chart.description.textColor = ContextCompat.getColor(this, R.color.colorSubtitle)
+
+        pie_chart.data = pieData
+        pie_chart.invalidate()
 
     }
 

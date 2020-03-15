@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     app:behavior_hideable="true"
-    app:behavior_peekHeight="120dp"
+    app:behavior_peekHeight="130dp"
     app:layout_behavior="@string/bottom_sheet_behavior">
 
     <androidx.cardview.widget.CardView
@@ -43,6 +43,15 @@
                     android:layout_marginStart="12dp"
                     android:textSize="18sp"
                     android:layout_marginTop="12dp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="last update: "
+                    android:id="@+id/text_last_update"
+                    android:layout_marginLeft="12dp"
+                    android:layout_marginStart="12dp"
+                    android:textSize="10sp"/>
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -125,6 +134,12 @@
 
                 </LinearLayout>
 
+                <com.github.mikephil.charting.charts.PieChart
+                    android:layout_width="300dp"
+                    android:layout_height="300dp"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="12dp"
+                    android:id="@+id/pie_chart" />
 
             </LinearLayout>
 

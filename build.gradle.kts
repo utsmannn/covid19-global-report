@@ -24,6 +24,11 @@ dependencies {
 		exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
 	}
 	implementation("com.github.doyaaaaaken:kotlin-csv-jvm:0.7.3")
+	implementation("org.json:json:20180813")
+	implementation("com.fasterxml.jackson.core:jackson-databind:2.9.7")
+	implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.9.7")
+	implementation("com.rometools:rome-modules:1.8.0")
+	implementation("org.jsoup:jsoup:1.13.1")
 }
 
 tasks.withType<Test> {

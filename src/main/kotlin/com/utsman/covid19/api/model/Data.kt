@@ -45,3 +45,10 @@ data class LastDate(
         val month: Int?,
         val year: Int?
 )
+
+data class Articles(
+        val title: String,
+        val url: String,
+        val publish_date: Long,
+        val publisher: String
+)
