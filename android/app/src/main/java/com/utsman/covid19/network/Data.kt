@@ -25,6 +25,18 @@ data class ResponsesLastDate(
     val lastDate: LastDate?
 )
 
+data class ResponsesArticles(
+    val message: String,
+    val topic: String,
+    val articles: List<Articles>,
+    val author: String
+)
+
+data class ResponsesImage(
+    @SerializedName("image_url")
+    val imageUrl: String?
+)
+
 data class DataCountry(
     val country: String?,
     val total: Total,
@@ -69,4 +81,12 @@ data class LastDate(
     val day: Int?,
     val month: Int?,
     val year: Int?
+)
+
+data class Articles(
+    val title: String,
+    val url: String,
+    @SerializedName("publish_date")
+    val publishDate: Long,
+    val publisher: String
 )
