@@ -134,16 +134,16 @@ class CovidController {
     }
 
     @GetMapping("/api/country", produces = [MediaType.APPLICATION_JSON_VALUE])
-    fun getByCountry(@RequestParam("day") day: Int,
-                     @RequestParam("month") month: Int,
-                     @RequestParam("year") year: Int,
+    fun getByCountry(@RequestParam("day") day: Int?,
+                     @RequestParam("month") month: Int?,
+                     @RequestParam("year") year: Int?,
                      @RequestParam("q") country: String?): ResponsesCountry {
 
         var message = "OK"
 
         val formatter = DecimalFormat("00")
-        val dayFormat = formatter.format(day.toLong())
-        val monthFormat = formatter.format(month.toLong())
+        val dayFormat = formatter.format(day?.toLong())
+        val monthFormat = formatter.format(month?.toLong())
 
         val url = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports/$monthFormat-$dayFormat-$year.csv"
 
@@ -235,25 +235,30 @@ class CovidController {
 
     @GetMapping("api/stat", produces = [MediaType.APPLICATION_JSON_VALUE])
     fun getTimeline(@RequestParam("q") country: String?): ResponsesTimeLine {
+        val lastDate = getLastDate().last_date
+
         val date1 = "4-3-2020"
         val date2 = "6-3-2020"
         val date3 = "8-3-2020"
         val date4 = "10-3-2020"
         val date5 = "12-3-2020"
+        val dateLast = "${lastDate?.day}-${lastDate?.month}-2020"
 
         val day1 = getByCountry(4, 3, 2020, country).total
         val day2 = getByCountry(6, 3, 2020, country).total
         val day3 = getByCountry(8, 3, 2020, country).total
         val day4 = getByCountry(10, 3, 2020, country).total
         val day5 = getByCountry(12, 3, 2020, country).total
+        val dayLast = getByCountry(lastDate?.day, lastDate?.month, 2020, country).total
 
         val dataTimeLine1 = DataTimeLine(date1, day1)
         val dataTimeLine2 = DataTimeLine(date2, day2)
         val dataTimeLine3 = DataTimeLine(date3, day3)
         val dataTimeLine4 = DataTimeLine(date4, day4)
         val dataTimeLine5 = DataTimeLine(date5, day5)
+        val dateTimeLineLast = DataTimeLine(dateLast, dayLast)
         val timeline = TimeLine(country
-                ?: "", listOf(dataTimeLine1, dataTimeLine2, dataTimeLine3, dataTimeLine4, dataTimeLine5))
+                ?: "", listOf(dataTimeLine1, dataTimeLine2, dataTimeLine3, dataTimeLine4, dataTimeLine5, dateTimeLineLast))
         return ResponsesTimeLine(
                 message = "OK",
                 timeLine = timeline,
@@ -277,7 +282,7 @@ class CovidController {
             dateString = if (listValue?.last() != "") {
                 listDate?.last()
             } else {
-                listDate?.get(listDate.size-2)
+                listDate?.get(listDate.size - 2)
             }
 
         } catch (e: HttpClientErrorException) {
@@ -348,7 +353,7 @@ class CovidController {
         val doc = Jsoup.connect(url).get()
         val element = doc.select("meta")
 
-        val imageUrlElement = element.map { it.attr("content")  }
+        val imageUrlElement = element.map { it.attr("content") }
         val imageUrl = imageUrlElement.find { it.toLowerCase().contains(".jpg") || it.toLowerCase().contains(".png") }
 
         println(imageUrl)
