@@ -237,12 +237,12 @@ class CovidController {
     fun getTimeline(@RequestParam("q") country: String?): ResponsesTimeLine {
         val lastDate = getLastDate().last_date
 
-        val date1 = "4-3-2020"
-        val date2 = "6-3-2020"
-        val date3 = "8-3-2020"
-        val date4 = "10-3-2020"
-        val date5 = "12-3-2020"
-        val dateLast = "${lastDate?.day}-${lastDate?.month}-2020"
+        val date1 = "4/3/20"
+        val date2 = "6/3/20"
+        val date3 = "8/3/20"
+        val date4 = "10/3/20"
+        val date5 = "12/3/20"
+        val dateLast = "${lastDate?.day}/${lastDate?.month}/20"
 
         val day1 = getByCountry(4, 3, 2020, country).total
         val day2 = getByCountry(6, 3, 2020, country).total

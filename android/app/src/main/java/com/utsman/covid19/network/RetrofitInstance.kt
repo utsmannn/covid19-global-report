@@ -41,10 +41,10 @@ interface RetrofitInstance {
         @Query("url") url: String?
     ): Observable<ResponsesImage>
 
-    @GET("/api/image_thumbnail")
-    fun callUrlThumbnail(
-        @Query("url") url: String?
-    ): Call<ResponsesImage>
+    @GET("/api/stat")
+    fun getStatTimeLine(
+        @Query("q") country: String?
+    ): Observable<ResponsesTimeLine>
 
     companion object {
 

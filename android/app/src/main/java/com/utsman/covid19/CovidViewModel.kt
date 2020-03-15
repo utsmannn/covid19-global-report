@@ -13,6 +13,7 @@ class CovidViewModel : ViewModel() {
     private var month: Int? = null
 
     val networkState: MutableLiveData<NetworkState> = MutableLiveData()
+    val networkStateTimeLine: MutableLiveData<NetworkState> = MutableLiveData()
     val throwable: MutableLiveData<Throwable> = MutableLiveData()
     val total: MutableLiveData<Total> = MutableLiveData()
     val totalCountry: MutableLiveData<Total> = MutableLiveData()
@@ -81,13 +82,6 @@ class CovidViewModel : ViewModel() {
             io = {
                 logi("get article ok")
 
-
-                /*it.articles.forEach {  article ->
-                    RetrofitInstance.create().getUrlThumbnail(article.url).subscribe { img ->
-                        article.imgUrl = img.imageUrl
-                    }
-                }*/
-
                 networkState.postValue(NetworkState.LOADED)
 
                 if (country == "") {
@@ -102,6 +96,26 @@ class CovidViewModel : ViewModel() {
                 throwable.postValue(it)
             }
         )
+    }
+
+    fun getTimeLine(country: String?): LiveData<TimeLine?> {
+        networkStateTimeLine.postValue(NetworkState.LOADING)
+        logi("get for country ---> $country")
+        val timeLine: MutableLiveData<TimeLine?> = MutableLiveData()
+        composite.route(
+            RetrofitInstance.create().getStatTimeLine(country)
+                .map { it.timeLine },
+            io = {
+                networkStateTimeLine.postValue(NetworkState.LOADED)
+                timeLine.postValue(it)
+            },
+            error = {
+                networkStateTimeLine.postValue(NetworkState.ERROR)
+                throwable.postValue(it)
+            }
+        )
+
+        return timeLine
     }
 
     override fun onCleared() {

@@ -38,6 +38,13 @@ data class ResponsesImage(
     val imageUrl: String?
 )
 
+data class ResponsesTimeLine(
+    val message: String,
+    val timeLine: TimeLine?,
+    val sources: List<Sources>,
+    val author: String
+)
+
 data class DataCountry(
     val country: String?,
     val total: Total,
@@ -91,4 +98,14 @@ data class Articles(
     val publishDate: Long,
     val publisher: String,
     var imgUrl: String? = null
+)
+
+data class TimeLine(
+    val country: String,
+    val timeLine: List<DataTimeLine>
+)
+
+data class DataTimeLine(
+    val date: String,
+    val total: Total
 )

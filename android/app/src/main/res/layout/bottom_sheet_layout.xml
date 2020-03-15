@@ -159,7 +159,7 @@
                             android:textSize="17sp"/>
 
                         <com.github.mikephil.charting.charts.LineChart
-                            android:layout_width="250dp"
+                            android:layout_width="match_parent"
                             android:layout_height="250dp"
                             android:layout_gravity="center"
                             android:layout_marginTop="12dp"

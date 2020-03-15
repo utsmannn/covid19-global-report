@@ -9,9 +9,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.lifecycle.Observer
-import com.github.mikephil.charting.data.PieData
-import com.github.mikephil.charting.data.PieDataSet
-import com.github.mikephil.charting.data.PieEntry
+import com.github.mikephil.charting.components.AxisBase
+import com.github.mikephil.charting.components.XAxis
+import com.github.mikephil.charting.data.*
+import com.github.mikephil.charting.formatter.IAxisValueFormatter
 import com.github.mikephil.charting.formatter.ValueFormatter
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.SupportMapFragment
@@ -23,10 +24,7 @@ import com.google.maps.android.clustering.ClusterManager
 import com.utsman.covid19.cluster.CovidCluster
 import com.utsman.covid19.cluster.CustomClusterRender
 import com.utsman.covid19.ext.*
-import com.utsman.covid19.network.Articles
-import com.utsman.covid19.network.ItemCluster
-import com.utsman.covid19.network.NetworkState
-import com.utsman.covid19.network.Total
+import com.utsman.covid19.network.*
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.bottom_sheet_layout.*
@@ -71,6 +69,10 @@ class MainActivity : AppCompatActivity() {
 
             bottomSheetBehavior.collapse(composite)
             viewModel.getArticles(country)
+
+            viewModel.getTimeLine(country).observe(this@MainActivity, Observer {
+                setupLineChart(it?.timeLine)
+            })
 
             setupPieChart(
                 Total(
@@ -274,6 +276,65 @@ class MainActivity : AppCompatActivity() {
 
         pie_chart.data = pieData
         pie_chart.invalidate()
+
+    }
+
+    private fun setupLineChart(data: List<DataTimeLine>?) {
+        val valueFormat = object : ValueFormatter() {
+            override fun getFormattedValue(value: Float): String {
+                return value.toInt().formatted()
+            }
+        }
+
+        /*val confirmedValue = (total?.confirmed ?: 0).toFloat()
+        val deathValue = (total?.death ?: 0).toFloat()
+        val recoveredValue = (total?.recovered ?: 0).toFloat()*/
+
+        /*val rawData = listOf(
+            PieEntry(confirmedValue, "Confirmed"),
+            PieEntry(deathValue, "Death"),
+            PieEntry(recoveredValue, "Recovered")
+        )*/
+
+        val rawData: MutableList<Entry> = mutableListOf()
+        data?.forEachIndexed { index, dataTimeLine ->
+            logi("index -> $index +++ data -> ${dataTimeLine.total.confirmed}")
+            val dataLine = Entry(index.toFloat(), dataTimeLine.total.confirmed.toFloat(), dataTimeLine.date)
+            rawData.add(dataLine)
+        }
+
+        val lineDataSet = LineDataSet(rawData, "")
+        lineDataSet.valueTextColor = Color.WHITE
+        lineDataSet.valueTextSize = 10f
+        lineDataSet.valueFormatter = valueFormat
+
+
+        val lineData = LineData(lineDataSet)
+        lineData.setValueTextColor(Color.WHITE)
+
+        val xAxis = line_chart.xAxis
+        // Set the xAxis position to bottom. Default is top
+        xAxis.position = XAxis.XAxisPosition.BOTTOM
+        //Customizing x axis value
+        val months = arrayOf("M", "T", "W", "T", "F", "S", "S")
+
+        val formatter = object : ValueFormatter() {
+            override fun getAxisLabel(value: Float, axis: AxisBase?): String?{
+                return data?.map { it.date }?.get(value.toInt())
+            }
+        }
+        //xAxis.granularity = 1f // minimum axis-step (interval) is 1
+        xAxis.valueFormatter = formatter
+
+        //line_chart.setEntryLabelTextSize(10f)
+        //line_chart.setHoleColor(Color.TRANSPARENT)
+        //line_chart.setEntryLabelColor(ContextCompat.getColor(this, R.color.colorSubtitle))
+        line_chart.legend.textColor = ContextCompat.getColor(this, R.color.colorSubtitle)
+        line_chart.description.text = ""
+        line_chart.description.textColor = ContextCompat.getColor(this, R.color.colorSubtitle)
+
+        line_chart.data = lineData
+        line_chart.invalidate()
 
     }
 
