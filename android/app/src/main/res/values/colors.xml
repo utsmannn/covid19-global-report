@@ -5,4 +5,9 @@
     <color name="colorAccent">#03DAC5</color>
 
     <color name="red">#00FFFFFF</color>
+
+    <color name="colorSubtitle">#7EFFFFFF</color>
+    <color name="colorConfirmed">#FF0404</color>
+    <color name="colorDeath">#FFBF00</color>
+    <color name="colorRecovered">#00A503</color>
 </resources>

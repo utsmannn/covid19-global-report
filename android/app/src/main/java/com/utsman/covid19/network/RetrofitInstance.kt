@@ -1,7 +1,5 @@
 package com.utsman.covid19.network
 
-import com.google.gson.FieldNamingPolicy
-import com.google.gson.GsonBuilder
 import io.reactivex.Observable
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -13,28 +11,25 @@ import retrofit2.http.Query
 
 interface RetrofitInstance {
 
+    @GET("/api/last_date")
+    fun getLastDate(): Observable<ResponsesLastDate>
+
     @GET("/api")
     fun getData(
-        @Query("day") day: Int,
-        @Query("month") month: Int,
-        @Query("year") year: Int,
-        @Query("q") query: String? = null
+        @Query("day") day: Int?,
+        @Query("month") month: Int?,
+        @Query("year") year: Int
     ): Observable<ResponsesData>
 
     @GET("/api/country")
     fun getDataCountry(
-        @Query("day") day: Int,
-        @Query("month") month: Int,
-        @Query("year") year: Int,
+        @Query("day") day: Int?,
+        @Query("month") month: Int?,
+        @Query("year") year: Int?,
         @Query("q") query: String? = null
     ): Observable<ResponsesCountry>
 
     companion object {
-
-        private val gson = GsonBuilder()
-            .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
-            .setLenient()
-            .create()
 
         private val okHttpClient = OkHttpClient.Builder()
             .addInterceptor(HttpLoggingInterceptor().apply {
@@ -47,6 +42,7 @@ interface RetrofitInstance {
                 .baseUrl("https://covid-19-report.herokuapp.com/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .client(okHttpClient)
                 .build()
 
             return builder.create(RetrofitInstance::class.java)

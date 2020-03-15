@@ -17,6 +17,14 @@ data class ResponsesCountry(
     val sources: List<Sources>,
     val author: String)
 
+data class ResponsesLastDate(
+    val message: String,
+    @SerializedName("last_date_string")
+    val lastDateString: String?,
+    @SerializedName("last_date")
+    val lastDate: LastDate?
+)
+
 data class DataCountry(
     val country: String?,
     val total: Total,
@@ -55,4 +63,10 @@ data class ItemCluster(
     val title: Int,
     val latLng: LatLng,
     val data: Data
+)
+
+data class LastDate(
+    val day: Int?,
+    val month: Int?,
+    val year: Int?
 )

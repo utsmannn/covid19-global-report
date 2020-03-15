@@ -15,6 +15,9 @@ import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
+import java.text.DecimalFormat
+import java.text.NumberFormat
+import java.util.*
 
 
 fun logi(msg: String?) = Log.d("COVID-19", msg)
@@ -56,4 +59,14 @@ fun createDrawableFromView(context: Context, view: View): Bitmap? {
     val canvas = Canvas(bitmap)
     view.draw(canvas)
     return bitmap
+}
+
+fun Int.formatted(): String {
+    var originalString = this.toString()
+    val longValue: Long
+    originalString = originalString.replace(",".toRegex(), "").replace(".", "")
+    longValue = originalString.toLong()
+    val formatter = NumberFormat.getInstance(Locale("en", "ID")) as DecimalFormat
+    formatter.applyPattern("#,###,###,###")
+    return formatter.format(longValue).replace(",",".")
 }
