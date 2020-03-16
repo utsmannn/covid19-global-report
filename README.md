@@ -13,8 +13,16 @@ See all documentation <br>
 https://github.com/utsmannn/covid19-global-report/blob/master/DOCUMENTATION.md
 
 ## Android
+|ss1|ss2|ss3|
+|---|---|---|
+| ![](https://raw.githubusercontent.com/utsmannn/covid19-global-report/master/img/Screenshot%202020-03-16%20at%208.50.43%20AM.png)|![](https://raw.githubusercontent.com/utsmannn/covid19-global-report/master/img/Screenshot%202020-03-16%20at%208.50.08%20AM.png)|![](https://raw.githubusercontent.com/utsmannn/covid19-global-report/master/img/Screenshot%202020-03-16%20at%208.54.48%20AM.png)|
 
+Go to folder
+https://github.com/utsmannn/covid19-global-report/tree/master/android <br>
+Download apk
+https://github.com/utsmannn/covid19-global-report/raw/master/android/app/release/app-release.apk
 
+---
 ### Source
 - World Health Organization (WHO): https://www.who.int/
 - DXY.cn. Pneumonia. 2020. http://3g.dxy.cn/newh5/view/pneumonia.
