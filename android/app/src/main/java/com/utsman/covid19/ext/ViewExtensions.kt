@@ -35,18 +35,18 @@ fun Activity.makeStatusBarTransparent() {
 
 fun View.setMarginTop(marginTop: Int) {
     val menuLayoutParams = this.layoutParams as ViewGroup.MarginLayoutParams
-    menuLayoutParams.setMargins(0, marginTop, 12.dp, 0)
+    menuLayoutParams.setMargins(12.dp, marginTop, 12.dp, 12.dp)
     this.layoutParams = menuLayoutParams
 }
 
 fun BottomSheetBehavior<*>.expand(composite: CompositeDisposable) {
-    composite.delay(100) {
+    composite.delay(500) {
         state = BottomSheetBehavior.STATE_EXPANDED
     }
 }
 
 fun BottomSheetBehavior<*>.collapse(composite: CompositeDisposable) {
-    composite.delay(100) {
+    composite.delay(500) {
         state = BottomSheetBehavior.STATE_COLLAPSED
     }
 }

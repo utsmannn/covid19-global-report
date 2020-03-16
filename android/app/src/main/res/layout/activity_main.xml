@@ -23,6 +23,12 @@
         android:id="@+id/main_progress_bar"
         tools:ignore="UnusedAttribute" />
 
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_menu"
+        android:id="@+id/button_menu"/>
+
     <include layout="@layout/bottom_sheet_layout"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

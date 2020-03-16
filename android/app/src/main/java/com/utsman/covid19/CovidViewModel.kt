@@ -118,6 +118,24 @@ class CovidViewModel : ViewModel() {
         return timeLine
     }
 
+    fun getSitRep(): LiveData<ResponseSituationReport?> {
+        val sitRep: MutableLiveData<ResponseSituationReport?> = MutableLiveData()
+        networkState.postValue(NetworkState.LOADING)
+        composite.route(
+            RetrofitInstance.create().getSitRep(),
+            io = {
+                sitRep.postValue(it)
+                networkState.postValue(NetworkState.LOADED)
+            },
+            error = {
+                throwable.postValue(it)
+                networkState.postValue(NetworkState.ERROR)
+            }
+        )
+
+        return sitRep
+    }
+
     override fun onCleared() {
         super.onCleared()
         composite.dispose()

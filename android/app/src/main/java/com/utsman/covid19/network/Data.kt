@@ -45,6 +45,11 @@ data class ResponsesTimeLine(
     val author: String
 )
 
+data class ResponseSituationReport(
+    @SerializedName("download_url")
+    val downloadUrl: String?
+)
+
 data class DataCountry(
     val country: String?,
     val total: Total,

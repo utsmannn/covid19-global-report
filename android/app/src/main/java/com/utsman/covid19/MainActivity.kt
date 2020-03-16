@@ -1,14 +1,21 @@
 package com.utsman.covid19
 
 import android.annotation.SuppressLint
+import android.app.DownloadManager
+import android.content.Context
+import android.content.Intent
 import android.graphics.Color
+import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
+import android.view.LayoutInflater
 import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.lifecycle.Observer
+import com.bumptech.glide.Glide
 import com.github.mikephil.charting.components.AxisBase
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.*
@@ -20,6 +27,10 @@ import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.gms.maps.model.Marker
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.maps.android.clustering.ClusterManager
+import com.mikepenz.materialdrawer.DrawerBuilder
+import com.mikepenz.materialdrawer.holder.DimenHolder
+import com.mikepenz.materialdrawer.model.DividerDrawerItem
+import com.mikepenz.materialdrawer.model.PrimaryDrawerItem
 import com.utsman.covid19.cluster.CovidCluster
 import com.utsman.covid19.cluster.CustomClusterRender
 import com.utsman.covid19.ext.*
@@ -29,6 +40,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.bottom_sheet_layout.*
 import kotlinx.android.synthetic.main.bottom_sheet_layout.view.*
 import kotlinx.android.synthetic.main.covid_info_window.view.*
+import kotlinx.android.synthetic.main.header_drawer.view.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -93,9 +105,9 @@ class MainActivity : AppCompatActivity() {
             insets.consumeSystemWindowInsets()
         }
 
+        setupDrawer()
         bottomSheetBehavior.hide()
         getTotal()
-
         main_progress_bar.setMarginTop(37.dp)
 
         viewModel.networkState.observe(this, Observer {
@@ -127,6 +139,9 @@ class MainActivity : AppCompatActivity() {
             addItems(it)
         })
 
+        viewModel.getTimeLine("").observe(this, Observer {
+            setupLineChart(it?.timeLine)
+        })
 
         viewModel.getLastDate().observe(this, Observer {
             val day = it.lastDate?.day
@@ -151,11 +166,12 @@ class MainActivity : AppCompatActivity() {
                     bottom_sheet.bottom_card.radius = 26.dpf
                 }
             }
-
         })
 
         val mapsView = (google_map_view as SupportMapFragment)
         mapsView.getMapAsync { gmap ->
+            gmap.uiSettings.isMapToolbarEnabled = false
+            gmap.setPadding(0, 0, 0, 130.dp)
             viewModel.getArticles("")
 
             gmap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.dark_maps))
@@ -221,6 +237,65 @@ class MainActivity : AppCompatActivity() {
                 }
             })
         }
+    }
+
+    private fun setupDrawer() {
+        val itemDownloadReport = primaryDrawer("WHO Report Docs", R.drawable.ic_info, 1L)
+        val itemSources = primaryDrawer("Sources", R.drawable.ic_info, 2L)
+        val itemFork = primaryDrawer("Fork Repository", R.drawable.ic_info, 3L)
+        val itemDoc = primaryDrawer("API Documentation", R.drawable.ic_info, 4L)
+
+        button_menu.setMarginTop(37.dp)
+
+        val headerView = LayoutInflater.from(this).inflate(R.layout.header_drawer, null)
+
+        val urlImage = "https://source.unsplash.com/featured/?covid,corona"
+        val urlSources = "https://github.com/CSSEGISandData/COVID-19/blob/master/README.md"
+        val urlRepo = "https://github.com/utsmannn/covid19-global-report"
+        val urlDoc = ""
+
+        Glide.with(this).load(urlImage).into(headerView.image_header)
+
+        val drawer = DrawerBuilder()
+            .withActivity(this)
+            .withHeader(headerView)
+            .withSliderBackgroundColorRes(R.color.colorPrimary)
+            .withHeaderHeight(DimenHolder.fromDp(200))
+            .withSelectedItem(20L)
+            .addDrawerItems(itemDownloadReport, itemSources, itemFork, itemDoc)
+            .withOnDrawerItemClickListener { view, position, drawerItem ->
+                when (drawerItem.identifier) {
+                    1L -> {
+                        getSitRep()
+                        false
+                    }
+                    2L -> {
+                        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(urlSources)))
+                        false
+                    }
+                    3L -> {
+                        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(urlRepo)))
+                        false
+                    }
+                    else -> {
+                        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(urlDoc)))
+                        false
+                    }
+                }
+            }
+            .build()
+
+        button_menu.setOnClickListener {
+            drawer.openDrawer()
+        }
+    }
+
+    private fun getSitRep() {
+        viewModel.getSitRep().observe(this, Observer {
+            val urlDownload = it?.downloadUrl
+            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(urlDownload)))
+
+        })
     }
 
     private fun addItems(it: List<Articles>) {
@@ -385,5 +460,17 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         composite.dispose()
+    }
+
+    private fun primaryDrawer(title: String, icon: Int, identifier: Long): PrimaryDrawerItem {
+        return PrimaryDrawerItem()
+            .withName(title)
+            .withIcon(icon)
+            .withIdentifier(identifier)
+            .withTextColorRes(R.color.colorSubtitle)
+            .withSelectedTextColor(Color.WHITE)
+            .withSelectedColorRes(R.color.colorDrawerSelected)
+            .withIconColorRes(R.color.colorDrawerSelected)
+            .withSelectable(false)
     }
 }

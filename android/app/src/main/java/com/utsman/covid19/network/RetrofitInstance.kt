@@ -46,6 +46,9 @@ interface RetrofitInstance {
         @Query("q") country: String?
     ): Observable<ResponsesTimeLine>
 
+    @GET("/api/sit_rep")
+    fun getSitRep(): Observable<ResponseSituationReport>
+
     companion object {
 
         private fun provideLoggingInterceptor(): HttpLoggingInterceptor {
