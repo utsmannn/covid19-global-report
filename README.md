@@ -1,5 +1,6 @@
-# Coronavirus Covid-19 Global Report Restful API
+# Coronavirus Covid-19 Global Report
 
+## Rest api
 ### How to use
 ```
 https://covid-19-report.herokuapp.com/api?day=12&month=3&year=2020
@@ -10,6 +11,8 @@ https://covid-19-report.herokuapp.com/api?day=12&month=3&year=2020&q=china
 
 See all documentation <br>
 https://github.com/utsmannn/covid19-global-report/blob/master/DOCUMENTATION.md
+
+## Android
 
 ### Source
 - World Health Organization (WHO): https://www.who.int/
