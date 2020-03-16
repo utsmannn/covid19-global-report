@@ -16,10 +16,12 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.lifecycle.Observer
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.github.mikephil.charting.components.AxisBase
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.*
 import com.github.mikephil.charting.formatter.ValueFormatter
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
@@ -152,26 +154,35 @@ class MainActivity : AppCompatActivity() {
             bottom_sheet.text_last_update.text = "Last update: $day/$month/$year"
         })
 
-        bottomSheetBehavior.addBottomSheetCallback(object :
-            BottomSheetBehavior.BottomSheetCallback() {
-            override fun onSlide(bottomSheet: View, slideOffset: Float) {
-            }
-
-            override fun onStateChanged(bottomSheet: View, newState: Int) {
-                if (newState == BottomSheetBehavior.STATE_EXPANDED) {
-                    bottom_sheet.container_main_info.animTo("Y", 25.dpf)
-                    bottom_sheet.bottom_card.radius = 0.dpf
-                } else {
-                    bottom_sheet.container_main_info.animTo("Y", 0.dpf)
-                    bottom_sheet.bottom_card.radius = 26.dpf
-                }
-            }
-        })
-
         val mapsView = (google_map_view as SupportMapFragment)
         mapsView.getMapAsync { gmap ->
+            val indonesiaLatLng = LatLng(-6.200000, 106.816666)
+            gmap.moveCamera(CameraUpdateFactory.newLatLng(indonesiaLatLng))
+
+            bottomSheetBehavior.addBottomSheetCallback(object :
+                BottomSheetBehavior.BottomSheetCallback() {
+                override fun onSlide(bottomSheet: View, slideOffset: Float) {
+                }
+
+                override fun onStateChanged(bottomSheet: View, newState: Int) {
+                    when (newState) {
+                        BottomSheetBehavior.STATE_EXPANDED -> {
+                            bottom_sheet.container_main_info.animTo("Y", 25.dpf)
+                            bottom_sheet.bottom_card.radius = 0.dpf
+                        }
+                        BottomSheetBehavior.STATE_COLLAPSED -> {
+                            bottom_sheet.container_main_info.animTo("Y", 0.dpf)
+                            bottom_sheet.bottom_card.radius = 26.dpf
+                            gmap.setPadding(0, 0, 0, 130.dp)
+                        }
+                        else -> {
+                            gmap.setPadding(0, 0, 0, 0)
+                        }
+                    }
+                }
+            })
+
             gmap.uiSettings.isMapToolbarEnabled = false
-            gmap.setPadding(0, 0, 0, 130.dp)
             viewModel.getArticles("")
 
             gmap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.dark_maps))
@@ -240,10 +251,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupDrawer() {
-        val itemDownloadReport = primaryDrawer("WHO Report Docs", R.drawable.ic_info, 1L)
-        val itemSources = primaryDrawer("Sources", R.drawable.ic_info, 2L)
-        val itemFork = primaryDrawer("Fork Repository", R.drawable.ic_info, 3L)
-        val itemDoc = primaryDrawer("API Documentation", R.drawable.ic_info, 4L)
+        val itemDownloadReport = primaryDrawer("WHO Documentation Report", R.drawable.ic_docs, 1L)
+        val itemSources = primaryDrawer("Covid-19 Data Sources", R.drawable.ic_source, 2L)
+        val itemFork = primaryDrawer("Fork Repository", R.drawable.ic_fork, 3L)
+        val itemDoc = primaryDrawer("API Documentation", R.drawable.ic_api_docs, 4L)
 
         button_menu.setMarginTop(37.dp)
 
@@ -252,9 +263,9 @@ class MainActivity : AppCompatActivity() {
         val urlImage = "https://source.unsplash.com/featured/?covid,corona"
         val urlSources = "https://github.com/CSSEGISandData/COVID-19/blob/master/README.md"
         val urlRepo = "https://github.com/utsmannn/covid19-global-report"
-        val urlDoc = ""
+        val urlDoc = "https://github.com/utsmannn/covid19-global-report/blob/master/DOCUMENTATION.md"
 
-        Glide.with(this).load(urlImage).into(headerView.image_header)
+        Glide.with(this).load(urlImage).diskCacheStrategy(DiskCacheStrategy.DATA).into(headerView.image_header)
 
         val drawer = DrawerBuilder()
             .withActivity(this)
@@ -262,7 +273,7 @@ class MainActivity : AppCompatActivity() {
             .withSliderBackgroundColorRes(R.color.colorPrimary)
             .withHeaderHeight(DimenHolder.fromDp(200))
             .withSelectedItem(20L)
-            .addDrawerItems(itemDownloadReport, itemSources, itemFork, itemDoc)
+            .addDrawerItems(itemDownloadReport, itemSources, DividerDrawerItem(), itemFork, itemDoc)
             .withOnDrawerItemClickListener { view, position, drawerItem ->
                 when (drawerItem.identifier) {
                     1L -> {

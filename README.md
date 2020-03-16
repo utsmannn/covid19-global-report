@@ -8,6 +8,9 @@ https://covid-19-report.herokuapp.com/api?day=12&month=3&year=2020
 https://covid-19-report.herokuapp.com/api?day=12&month=3&year=2020&q=china
 ```
 
+See all documentation <br>
+https://github.com/utsmannn/covid19-global-report/blob/master/DOCUMENTATION.md
+
 ### Source
 - World Health Organization (WHO): https://www.who.int/
 - DXY.cn. Pneumonia. 2020. http://3g.dxy.cn/newh5/view/pneumonia.

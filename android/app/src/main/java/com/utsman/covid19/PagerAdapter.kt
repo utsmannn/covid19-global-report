@@ -2,9 +2,12 @@ package com.utsman.covid19
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.browser.customtabs.CustomTabsIntent
+import androidx.core.content.ContextCompat
 import androidx.viewpager.widget.PagerAdapter
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -43,6 +46,14 @@ class PagerAdapter(private val context: Context) : PagerAdapter() {
             }, {
                it.printStackTrace()
             })
+
+        val builder = CustomTabsIntent.Builder()
+        builder.setToolbarColor(ContextCompat.getColor(context, R.color.colorPrimary))
+        val customTab = builder.build()
+
+        view.setOnClickListener {
+            customTab.launchUrl(context, Uri.parse(articles.url))
+        }
 
         container.addView(view)
 
