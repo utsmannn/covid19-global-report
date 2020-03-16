@@ -251,7 +251,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupDrawer() {
-        val itemDownloadReport = primaryDrawer("WHO Documentation Report", R.drawable.ic_docs, 1L)
+        val itemDownloadReport = primaryDrawer("WHO Situation Report", R.drawable.ic_docs, 1L)
         val itemSources = primaryDrawer("Covid-19 Data Sources", R.drawable.ic_source, 2L)
         val itemFork = primaryDrawer("Fork Repository", R.drawable.ic_fork, 3L)
         val itemDoc = primaryDrawer("API Documentation", R.drawable.ic_api_docs, 4L)
