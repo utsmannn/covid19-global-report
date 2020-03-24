@@ -37,7 +37,7 @@ data class TimeLine(
 
 data class DataTimeLine(
         val date: String,
-        val total: Total
+        val total: Total?
 )
 
 data class LastDate(

@@ -29,6 +29,7 @@ dependencies {
 	implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.9.7")
 	implementation("com.rometools:rome-modules:1.8.0")
 	implementation("org.jsoup:jsoup:1.13.1")
+	implementation("com.vladsch.flexmark:flexmark-all:0.60.2")
 }
 
 tasks.withType<Test> {

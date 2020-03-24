@@ -2,22 +2,20 @@ package com.utsman.covid19.api.model
 
 data class Responses(
         val message: String,
+        val last_update: String,
         val total: Total,
         val data: List<Data>?,
-        val sources: List<Sources>,
         val author: String)
 
 data class ResponsesCountry(
         val message: String,
         val total: Total,
         val countries: List<DataCountry>?,
-        val sources: List<Sources>,
         val author: String)
 
 data class ResponsesTimeLine(
         val message: String,
         val timeLine: TimeLine?,
-        val sources: List<Sources>,
         val author: String
 )
 

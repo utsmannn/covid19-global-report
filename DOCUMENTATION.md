@@ -2,31 +2,14 @@
 
 ## Base Url
 Api available at ```https://covid-19-report.herokuapp.com```
-## Last update
-```GET /api/last_date```
-#### Response
-```json
-{
-  "message": "OK",
-  "last_date_string": "3/15/20",
-  "last_date": {
-    "day": 15,
-    "month": 3,
-    "year": 20
-  }
-}
-```
 ## Status and Country
-### Worldwide Status
 ```GET /api```
-#### Parameter
+### Parameter
 | Param | Type | Desc |
 |---|---|---|
-| `day` | Int (required) | Day in month |
-| `month` | Int (required) | Month in year |
-| `year` | Int (required) | year |
+| `q` | String (optional) | country by query |
 
-#### Response
+### Response
 ```json
 {
   "message": "OK",
@@ -66,64 +49,15 @@ Api available at ```https://covid-19-report.herokuapp.com```
 }
 ```
 
-### Country Status
-
-```GET /api/country```
-#### Parameter
-| Param | Type | Desc |
-|---|---|---|
-| `day` | Int (required) | Day in month |
-| `month` | Int (required) | Month in year |
-| `year` | Int (required) | year |
-| `q` | String (optional) | country by query |
-
-#### Response
-```json
-{
-  "message": "OK",
-  "total": {
-    "confirmed": 34,
-    "death": 1,
-    "recovered": 2
-  },
-  "countries": [
-    {
-      "country": "Indonesia",
-      "total": {
-        "confirmed": 34,
-        "death": 1,
-        "recovered": 2
-      },
-      "data": [
-        {
-          "id": 84,
-          "country": "Indonesia",
-          "province_or_state": "Unknown",
-          "confirmed": 34,
-          "death": 1,
-          "recovered": 2,
-          "lastUpdate": 1586565501219,
-          "coordinate": [
-            -0.7893,
-            113.9213
-          ]
-        }
-      ]
-    }
-  ]
-}
-```
-
-## Timeline and Situation Document
-### Timeline (only available in march)
+## Timeline (only available in march)
 ```GET /api/stat```
 
-#### Parameter
+### Parameter
 | Param | Type | Desc |
 |---|---|---|
 | `q` | String (optional) | country by query |
 
-#### Response
+### Response
 ```json
 {
   "message": "OK",
@@ -151,23 +85,23 @@ Api available at ```https://covid-19-report.herokuapp.com```
 }
 ```
 
-### WHO Situation Report
+## WHO Situation Report
 ```GET /api/sit_rep```
-#### Response
+### Response
 ```json
 {
   "download_url": "https://github.com/CSSEGISandData/COVID-19/raw/master/who_covid_19_situation_reports/who_covid_19_sit_rep_pdfs/20200310-sitrep-50-covid-19.pdf"
 }
 ```
 
-### Articles
+## Articles
 ```GET /api/articles```
-#### Parameter
+### Parameter
 | Param | Type | Desc |
 |---|---|---|
 | `q` | String (optional) | country by query |
 
-#### Response
+### Response
 ```json
 {
   "message": "OK",
